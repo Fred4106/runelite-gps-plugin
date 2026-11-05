@@ -198,8 +198,10 @@ public class RouteDirectionsOverlay extends OverlayPanel {
         List<Line> lines = new ArrayList<>();
         arrivalSource = plugin.getTargetSource();
         // "Destination set by ...", or during a bank trip what resumes after it (BankDetour.headerLine).
+        // The compact overlay shows the steps only.
+        final boolean compact = plugin.display().compactOverlay;
         String destinationLine = plugin.getDestinationLine();
-        if (destinationLine != null)
+        if (destinationLine != null && !compact)
             lines.add(new Line(destinationLine, fontOther, UPCOMING, null, null));
         // Drifting off the drawn path: warn before the route is recomputed (the middle of the three
         // distance bands — see ShortestPathPlugin's off-route handling).
@@ -264,7 +266,7 @@ public class RouteDirectionsOverlay extends OverlayPanel {
 
         // Compact overlay: the steps only, no header row and no ETA pill.
         Dimension dimension = renderPanel(graphics, lines);
-        if (dimension != null && !plugin.display().compactOverlay)
+        if (dimension != null && !compact)
             drawEtaBadge(graphics, dimension, etaText);
         return dimension;
     }
@@ -610,7 +612,7 @@ public class RouteDirectionsOverlay extends OverlayPanel {
     private Dimension renderFinding(Graphics2D graphics) {
         List<Line> lines = new ArrayList<>();
         String destinationLine = plugin.getDestinationLine();
-        if (destinationLine != null)
+        if (destinationLine != null && !plugin.display().compactOverlay)
             lines.add(new Line(destinationLine, fontOther, UPCOMING, null, null));
         lines.add(new Line(" ", fontOther, UPCOMING, null, null));
         lines.add(new Line("Finding the best route...", fontCurrent, NEXT, null, null, true));
@@ -620,7 +622,7 @@ public class RouteDirectionsOverlay extends OverlayPanel {
 
     private Dimension renderArrival(Graphics2D graphics) {
         List<Line> lines = new ArrayList<>();
-        if (arrivalSource != null)
+        if (arrivalSource != null && !plugin.display().compactOverlay)
             lines.add(new Line("Destination set by " + arrivalSource, fontOther, UPCOMING, null, null));
         lines.add(new Line("Arrived!", fontCurrent, ARRIVED, null, null, true));
         lines.add(new Line("in " + formatTime((int) (arrivalElapsedMillis / 1000)), fontNext, NEXT, null, null, true));
