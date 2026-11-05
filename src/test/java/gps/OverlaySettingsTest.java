@@ -39,7 +39,6 @@ public class OverlaySettingsTest
 	{
 		lenient().when(config.drawMap()).thenReturn(true);
 		lenient().when(config.colourPath()).thenReturn(Color.BLUE);
-		lenient().when(config.overlayFontSize()).thenReturn(OverlayFontSize.LARGE);
 		lenient().when(config.unreachableText()).thenReturn("Unreachable");
 		lenient().when(config.arrivalDismissSeconds()).thenReturn(8);
 		lenient().when(config.directionsSteps()).thenReturn(5);
@@ -57,7 +56,6 @@ public class OverlaySettingsTest
 		assertTrue(settings.useCustomOverlayFont);
 		assertEquals(FontType.BOLD, settings.overlayFont);
 		assertEquals(Color.BLUE, settings.colourPath);
-		assertEquals(OverlayFontSize.LARGE, settings.overlayFontSize);
 		assertEquals("Unreachable", settings.unreachableText);
 		assertEquals(8, settings.arrivalDismissSeconds);
 		assertEquals("the directions overlay's line budget (a 15-step route took the screen)", 5, settings.directionsSteps);
@@ -72,7 +70,7 @@ public class OverlaySettingsTest
 		assertFalse(after.drawMap);
 		assertEquals(Color.RED, after.colourPath);
 		assertEquals(2, after.arrivalDismissSeconds);
-		assertEquals("the font size is display-only, never overridden", OverlayFontSize.LARGE, after.overlayFontSize);
+		assertEquals("the overlay font is display-only, never overridden", FontType.BOLD, after.overlayFont);
 		assertTrue("an earlier snapshot is immutable", before.drawMap);
 	}
 }

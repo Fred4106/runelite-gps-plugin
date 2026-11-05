@@ -94,7 +94,6 @@ Directions and in-game overlays	gps/SpellbookOverlay.java
 Directions and in-game overlays	gps/SpellWidgets.java
 Directions and in-game overlays	gps/FairyRingHighlighter.java
 Directions and in-game overlays	gps/OverlaySettings.java
-Directions and in-game overlays	gps/OverlayFontSize.java
 Directions and in-game overlays	gps/MapMenu.java
 Swing side panel	gps/ShortestPathPanel.java
 Swing side panel	gps/RouteListView.java

@@ -33,10 +33,9 @@ final class OverlaySettings {
     final int directionsSteps;
     final boolean overrideOverlayTransparency;
     final int overlayTransparency;
-    // Display-only preference; not part of the capture-replay override set.
-    final OverlayFontSize overlayFontSize;
-    // Compact: the steps only, no header row (title, pin, ETA pill). Custom font: RuneLite's font
-    // editor replaces the text-size presets. Display-only preferences too.
+    // Display-only preferences; not part of the capture-replay override set. Compact: the steps
+    // only, no header row (title, pin, ETA pill). Custom font: RuneLite's font editor replaces the
+    // native RuneScape faces.
     final boolean compactOverlay;
     final boolean useCustomOverlayFont;
     final FontType overlayFont;
@@ -74,7 +73,6 @@ final class OverlaySettings {
         directionsSteps = ConfigOverrides.override("directionsSteps", config.directionsSteps());
         overrideOverlayTransparency = ConfigOverrides.override("overrideOverlayTransparency", config.overrideOverlayTransparency());
         overlayTransparency = ConfigOverrides.override("overlayTransparency", config.overlayTransparency());
-        overlayFontSize = config.overlayFontSize();
         compactOverlay = config.compactOverlay();
         useCustomOverlayFont = config.useCustomOverlayFont();
         overlayFont = config.overlayFont();

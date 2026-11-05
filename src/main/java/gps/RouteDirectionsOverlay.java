@@ -54,10 +54,9 @@ public class RouteDirectionsOverlay extends OverlayPanel {
     private static final Color UPCOMING = new Color(0xB4, 0xB4, 0xB4);
     private static final Color OFF_ROUTE = new Color(0xFF, 0x4C, 0x4C);
 
-    // Magnifying-glass hierarchy: bold > regular > small, mapped from the text-size preset onto
-    // combinations that render crisply (see OverlayFontSize — the pixel-art fonts only look right
-    // at their native size 16 or exactly pixel-doubled).
-    // What the current fonts were built from (preset, or the custom font's family, size and style).
+    // Magnifying-glass hierarchy: bold > regular > small, the native RuneScape faces at the size 16
+    // their pixel art is drawn for, unless the custom font replaces them.
+    // What the current fonts were built from (native, or the custom font's family, size and style).
     private String fontKey = "";
     private Font fontCurrent = FontManager.getRunescapeBoldFont();
     private Font fontNext = FontManager.getRunescapeFont();
@@ -380,17 +379,16 @@ public class RouteDirectionsOverlay extends OverlayPanel {
         return new Color(standard.getRed(), standard.getGreen(), standard.getBlue(), alpha);
     }
 
-    /** Rebuilds the three fonts when the text-size preset or the custom font changes. */
+    /** Rebuilds the three fonts when the custom font changes or is switched on or off. */
     private void refreshFonts() {
         final OverlaySettings display = plugin.display();
-        final OverlayFontSize preset = display.overlayFontSize == null ? OverlayFontSize.NORMAL : display.overlayFontSize;
         final FontType custom = display.useCustomOverlayFont ? display.overlayFont : null;
-        final String key = custom == null ? preset.name()
+        final String key = custom == null ? "native"
             : custom.getFamily() + "|" + custom.getSize() + "|" + custom.isBold() + "|" + custom.isItalic();
         if (key.equals(fontKey))
             return;
         fontKey = key;
-        Font[] fonts = fontsFor(preset, custom, custom != null);
+        Font[] fonts = fontsFor(custom);
         fontCurrent = fonts[0];
         fontNext = fonts[1];
         fontOther = fonts[2];
@@ -398,30 +396,14 @@ public class RouteDirectionsOverlay extends OverlayPanel {
 
     /**
      * The fonts for the current step, the next step and the rest. A custom font (RuneLite's font
-     * editor) draws every line, the current step in bold; otherwise the preset maps the RuneScape
-     * faces onto sizes that render crisply.
+     * editor) draws every line, the current step in bold; without one, the native RuneScape faces.
      */
-    static Font[] fontsFor(OverlayFontSize preset, FontType custom, boolean useCustom) {
-        if (useCustom && custom != null) {
+    static Font[] fontsFor(FontType custom) {
+        if (custom != null) {
             Font base = custom.getFont();
             return new Font[]{base.deriveFont(base.getStyle() | Font.BOLD), base, base};
         }
-        final Font bold = FontManager.getRunescapeBoldFont();
-        final Font regular = FontManager.getRunescapeFont();
-        final Font small = FontManager.getRunescapeSmallFont();
-        switch (preset) {
-            case SMALL:
-                // The hierarchy shifted one tier down, every face at its native size.
-                return new Font[]{regular, small, small};
-            case LARGE:
-                // The in-between step at 1.5x — a touch softer than the exact-multiple sizes.
-                return new Font[]{bold.deriveFont(24f), regular.deriveFont(24f), small.deriveFont(24f)};
-            case EXTRA_LARGE:
-                // Exactly pixel-doubled: the enlargement that keeps the pixel fonts sharp.
-                return new Font[]{bold.deriveFont(32f), regular.deriveFont(32f), small.deriveFont(32f)};
-            default:
-                return new Font[]{bold, regular, small};
-        }
+        return new Font[]{FontManager.getRunescapeBoldFont(), FontManager.getRunescapeFont(), FontManager.getRunescapeSmallFont()};
     }
 
     /** Blends a colour toward white — the derived "about to end" shade of the accent. */
