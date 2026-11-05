@@ -577,7 +577,7 @@ public interface ShortestPathConfig extends Config {
     }
 
     @ConfigItem(keyName = "compactOverlay", name = "Compact overlay", position = 78, section = sectionDisplay,
-        description = "Drop the directions overlay's header row (title, pin and ETA pill); the ETA becomes its last line")
+        description = "Steps only: drop the directions overlay's header row (title, pin and the ETA pill)")
     default boolean compactOverlay() {
         return false;
     }

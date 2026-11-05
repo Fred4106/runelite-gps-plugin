@@ -35,8 +35,8 @@ final class OverlaySettings {
     final int overlayTransparency;
     // Display-only preference; not part of the capture-replay override set.
     final OverlayFontSize overlayFontSize;
-    // Compact: no header row (title, pin, ETA pill), the ETA as the last line. Custom font: RuneLite's
-    // font editor replaces the text-size presets. Display-only preferences too.
+    // Compact: the steps only, no header row (title, pin, ETA pill). Custom font: RuneLite's font
+    // editor replaces the text-size presets. Display-only preferences too.
     final boolean compactOverlay;
     final boolean useCustomOverlayFont;
     final FontType overlayFont;

@@ -262,12 +262,9 @@ public class RouteDirectionsOverlay extends OverlayPanel {
         if (i < steps.size())
             lines.add(new Line("… " + (steps.size() - i) + " more", fontOther, DONE, null, null));
 
-        // Compact overlay: the ETA is the last line, there being no header row for the pill to sit on.
-        final boolean compact = plugin.display().compactOverlay;
-        if (compact)
-            lines.add(new Line("ETA", fontOther, UPCOMING, etaText.substring("ETA: ".length()), NEXT));
+        // Compact overlay: the steps only, no header row and no ETA pill.
         Dimension dimension = renderPanel(graphics, lines);
-        if (dimension != null && !compact)
+        if (dimension != null && !plugin.display().compactOverlay)
             drawEtaBadge(graphics, dimension, etaText);
         return dimension;
     }
