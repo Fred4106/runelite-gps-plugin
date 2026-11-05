@@ -1,6 +1,7 @@
 package gps;
 
 import java.awt.Color;
+import net.runelite.client.config.FontType;
 
 /**
  * The display settings the overlays read every frame (plan step L24, out of the plugin
@@ -34,6 +35,11 @@ final class OverlaySettings {
     final int overlayTransparency;
     // Display-only preference; not part of the capture-replay override set.
     final OverlayFontSize overlayFontSize;
+    // Compact: no header row (title, pin, ETA pill), the ETA as the last line. Custom font: RuneLite's
+    // font editor replaces the text-size presets. Display-only preferences too.
+    final boolean compactOverlay;
+    final boolean useCustomOverlayFont;
+    final FontType overlayFont;
     final boolean arrivalAutoDismiss;
     final int arrivalDismissSeconds;
     final int unreachableTargetDistance;
@@ -69,6 +75,9 @@ final class OverlaySettings {
         overrideOverlayTransparency = ConfigOverrides.override("overrideOverlayTransparency", config.overrideOverlayTransparency());
         overlayTransparency = ConfigOverrides.override("overlayTransparency", config.overlayTransparency());
         overlayFontSize = config.overlayFontSize();
+        compactOverlay = config.compactOverlay();
+        useCustomOverlayFont = config.useCustomOverlayFont();
+        overlayFont = config.overlayFont();
         arrivalAutoDismiss = ConfigOverrides.override("arrivalAutoDismiss", config.arrivalAutoDismiss());
         arrivalDismissSeconds = ConfigOverrides.override("arrivalDismissSeconds", config.arrivalDismissSeconds());
     }

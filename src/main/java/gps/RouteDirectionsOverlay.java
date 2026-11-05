@@ -19,6 +19,7 @@ import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.Player;
 import net.runelite.api.gameval.VarbitID;
+import net.runelite.client.config.FontType;
 import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -56,7 +57,8 @@ public class RouteDirectionsOverlay extends OverlayPanel {
     // Magnifying-glass hierarchy: bold > regular > small, mapped from the text-size preset onto
     // combinations that render crisply (see OverlayFontSize — the pixel-art fonts only look right
     // at their native size 16 or exactly pixel-doubled).
-    private OverlayFontSize fontSize = OverlayFontSize.NORMAL;
+    // What the current fonts were built from (preset, or the custom font's family, size and style).
+    private String fontKey = "";
     private Font fontCurrent = FontManager.getRunescapeBoldFont();
     private Font fontNext = FontManager.getRunescapeFont();
     private Font fontOther = FontManager.getRunescapeSmallFont();
@@ -260,8 +262,12 @@ public class RouteDirectionsOverlay extends OverlayPanel {
         if (i < steps.size())
             lines.add(new Line("… " + (steps.size() - i) + " more", fontOther, DONE, null, null));
 
+        // Compact overlay: the ETA is the last line, there being no header row for the pill to sit on.
+        final boolean compact = plugin.display().compactOverlay;
+        if (compact)
+            lines.add(new Line("ETA", fontOther, UPCOMING, etaText.substring("ETA: ".length()), NEXT));
         Dimension dimension = renderPanel(graphics, lines);
-        if (dimension != null)
+        if (dimension != null && !compact)
             drawEtaBadge(graphics, dimension, etaText);
         return dimension;
     }
@@ -290,11 +296,15 @@ public class RouteDirectionsOverlay extends OverlayPanel {
 
         // Spacer reserving the header row; the decorated title (pin glyph + bold text + accent rule)
         // is custom-drawn over it after the panel renders — TitleComponent supports no font/styling.
-        panelComponent.getChildren().add(
-            LineComponent.builder()
-                .left(" ")
-                .leftFont(fontCurrent)
-                .build());
+        // The compact overlay has no header row at all.
+        final boolean compact = plugin.display().compactOverlay;
+        if (!compact) {
+            panelComponent.getChildren().add(
+                LineComponent.builder()
+                    .left(" ")
+                    .leftFont(fontCurrent)
+                    .build());
+        }
         for (Line line : lines) {
             if (line.centred) {
                 // Reserve the row with a spacer in the same font; the text itself is drawn
@@ -317,7 +327,8 @@ public class RouteDirectionsOverlay extends OverlayPanel {
 
         Dimension dimension = super.render(graphics);
         if (dimension != null) {
-            drawTitle(graphics, dimension);
+            if (!compact)
+                drawTitle(graphics, dimension);
             drawCentredLines(graphics, dimension, lines);
         }
         return dimension;
@@ -370,40 +381,47 @@ public class RouteDirectionsOverlay extends OverlayPanel {
         return new Color(standard.getRed(), standard.getGreen(), standard.getBlue(), alpha);
     }
 
-    /** Rebuilds the three fonts when the text-size preset changes. */
+    /** Rebuilds the three fonts when the text-size preset or the custom font changes. */
     private void refreshFonts() {
-        final OverlayFontSize preset = plugin.display().overlayFontSize == null
-            ? OverlayFontSize.NORMAL : plugin.display().overlayFontSize;
-        if (preset == fontSize)
+        final OverlaySettings display = plugin.display();
+        final OverlayFontSize preset = display.overlayFontSize == null ? OverlayFontSize.NORMAL : display.overlayFontSize;
+        final FontType custom = display.useCustomOverlayFont ? display.overlayFont : null;
+        final String key = custom == null ? preset.name()
+            : custom.getFamily() + "|" + custom.getSize() + "|" + custom.isBold() + "|" + custom.isItalic();
+        if (key.equals(fontKey))
             return;
-        fontSize = preset;
+        fontKey = key;
+        Font[] fonts = fontsFor(preset, custom, custom != null);
+        fontCurrent = fonts[0];
+        fontNext = fonts[1];
+        fontOther = fonts[2];
+    }
+
+    /**
+     * The fonts for the current step, the next step and the rest. A custom font (RuneLite's font
+     * editor) draws every line, the current step in bold; otherwise the preset maps the RuneScape
+     * faces onto sizes that render crisply.
+     */
+    static Font[] fontsFor(OverlayFontSize preset, FontType custom, boolean useCustom) {
+        if (useCustom && custom != null) {
+            Font base = custom.getFont();
+            return new Font[]{base.deriveFont(base.getStyle() | Font.BOLD), base, base};
+        }
         final Font bold = FontManager.getRunescapeBoldFont();
         final Font regular = FontManager.getRunescapeFont();
         final Font small = FontManager.getRunescapeSmallFont();
         switch (preset) {
             case SMALL:
                 // The hierarchy shifted one tier down, every face at its native size.
-                fontCurrent = regular;
-                fontNext = small;
-                fontOther = small;
-                break;
+                return new Font[]{regular, small, small};
             case LARGE:
                 // The in-between step at 1.5x — a touch softer than the exact-multiple sizes.
-                fontCurrent = bold.deriveFont(24f);
-                fontNext = regular.deriveFont(24f);
-                fontOther = small.deriveFont(24f);
-                break;
+                return new Font[]{bold.deriveFont(24f), regular.deriveFont(24f), small.deriveFont(24f)};
             case EXTRA_LARGE:
                 // Exactly pixel-doubled: the enlargement that keeps the pixel fonts sharp.
-                fontCurrent = bold.deriveFont(32f);
-                fontNext = regular.deriveFont(32f);
-                fontOther = small.deriveFont(32f);
-                break;
+                return new Font[]{bold.deriveFont(32f), regular.deriveFont(32f), small.deriveFont(32f)};
             default:
-                fontCurrent = bold;
-                fontNext = regular;
-                fontOther = small;
-                break;
+                return new Font[]{bold, regular, small};
         }
     }
 

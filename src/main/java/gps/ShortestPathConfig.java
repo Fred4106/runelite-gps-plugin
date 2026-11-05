@@ -576,10 +576,28 @@ public interface ShortestPathConfig extends Config {
         return 100;
     }
 
+    @ConfigItem(keyName = "compactOverlay", name = "Compact overlay", position = 78, section = sectionDisplay,
+        description = "Drop the directions overlay's header row (title, pin and ETA pill); the ETA becomes its last line")
+    default boolean compactOverlay() {
+        return false;
+    }
+
     @ConfigItem(keyName = "overlayFontSize", name = "Overlay text size", position = 78, section = sectionDisplay,
         description = "Directions overlay text size; Small and Normal are the native faces, Extra large pixel-doubles them, Large is a softer 1.5x")
     default OverlayFontSize overlayFontSize() {
         return OverlayFontSize.NORMAL;
+    }
+
+    @ConfigItem(keyName = "useCustomOverlayFont", name = "Custom overlay font", position = 78, section = sectionDisplay,
+        description = "Draw the directions overlay in the font chosen below instead of the text-size presets")
+    default boolean useCustomOverlayFont() {
+        return false;
+    }
+
+    @ConfigItem(keyName = "overlayFont", name = "Overlay font", position = 78, section = sectionDisplay,
+        description = "Family, size and style for the directions overlay while the custom font is on; the current step is drawn bold")
+    default FontType overlayFont() {
+        return FontType.REGULAR;
     }
 
     @ConfigItem(keyName = "arrivalAutoDismiss", name = "Auto-dismiss arrival", position = 79, section = sectionDisplay,

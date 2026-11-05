@@ -1,6 +1,7 @@
 package gps;
 
 import java.awt.Color;
+import net.runelite.client.config.FontType;
 import java.util.Map;
 import org.junit.After;
 import org.junit.Before;
@@ -42,6 +43,9 @@ public class OverlaySettingsTest
 		lenient().when(config.unreachableText()).thenReturn("Unreachable");
 		lenient().when(config.arrivalDismissSeconds()).thenReturn(8);
 		lenient().when(config.directionsSteps()).thenReturn(5);
+		lenient().when(config.compactOverlay()).thenReturn(true);
+		lenient().when(config.useCustomOverlayFont()).thenReturn(true);
+		lenient().when(config.overlayFont()).thenReturn(FontType.BOLD);
 	}
 
 	@Test
@@ -49,6 +53,9 @@ public class OverlaySettingsTest
 	{
 		OverlaySettings settings = OverlaySettings.from(config);
 		assertTrue(settings.drawMap);
+		assertTrue("compact overlay (no header row)", settings.compactOverlay);
+		assertTrue(settings.useCustomOverlayFont);
+		assertEquals(FontType.BOLD, settings.overlayFont);
 		assertEquals(Color.BLUE, settings.colourPath);
 		assertEquals(OverlayFontSize.LARGE, settings.overlayFontSize);
 		assertEquals("Unreachable", settings.unreachableText);
