@@ -25,6 +25,20 @@ public class DestinationRemapTest
 		assertEquals(Set.of(TEMPLE_DOORS), Destinations.walkableTargets(null, wellPlatform));
 	}
 
+	/**
+	 * The TzHaar Fight Cave's arena is instanced; its template lies south-west of Mor Ul Rek and
+	 * the "Fight Cave" destination used to point into it, so a search for it walked "as close as
+	 * possible" and stopped 33 tiles short (capture 2026-11-07). The zone snaps to the tile north
+	 * of the cave entrance (object 11833 at 2437 5166).
+	 */
+	@Test
+	public void fightCaveArenaSnapsToTheCaveEntrance()
+	{
+		int entrance = WorldPointUtil.packWorldPoint(2438, 5168, 0);
+		assertEquals(entrance, Destinations.remapTemplateOnlyZones(WorldPointUtil.packWorldPoint(2400, 5092, 0)));
+		assertEquals(entrance, Destinations.remapTemplateOnlyZones(entrance));
+	}
+
 	@Test
 	public void boxEdgesAndOtherPlanesPassThrough()
 	{
