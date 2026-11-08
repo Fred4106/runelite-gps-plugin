@@ -11,9 +11,11 @@ import net.runelite.api.Client;
 final class PanelVarbits {
     // Varbit 2187: 0 = no house, 1-9 = the owned location.
     private static final int HOUSE_LOCATION = 2187;
-    private static final String[] HOUSE_LOCATIONS = {
-        null, "Rimmington", "Taverley", "Pollnivneach", "Rellekka", "Brimhaven",
-        "Yanille", "Prifddinas", "Hosidius", "Aldarin"};
+    private static final int HOUSE_LOCATION_ENUM_ID = 252;
+    private static EnumComposition HOUSE_LOCATIONS = null;
+    // private static final String[] HOUSE_LOCATIONS = {
+    //     null, "Rimmington", "Taverley", "Pollnivneach", "Rellekka", "Brimhaven",
+    //     "Yanille", "Prifddinas", "Hosidius", "Aldarin"};
     // ZEP_MULTI_* in {Entrana, Taverley, Castle Wars, Grand Tree, Crafting Guild, Varrock} order.
     private static final int[] BALLOON_UNLOCKS = {2867, 2868, 2869, 2870, 2871, 2872};
 
@@ -22,6 +24,9 @@ final class PanelVarbits {
 
     /** Client thread, once per game tick. */
     void onTick(Client client) {
+        if(PanelVarbits.HOUSE_LOCATIONS == null) {
+            PanelVarbits.HOUSE_LOCATIONS = client.getEnum(HOUSE_LOCATION_ENUM_ID);
+        }
         houseLocationId = client.getVarbitValue(HOUSE_LOCATION);
         int[] unlocks = new int[BALLOON_UNLOCKS.length];
         for (int i = 0; i < unlocks.length; i++)
@@ -35,7 +40,7 @@ final class PanelVarbits {
     }
 
     static String houseLocationName(int id) {
-        return (id > 0 && id < HOUSE_LOCATIONS.length) ? HOUSE_LOCATIONS[id] : null;
+        return HOUSE_LOCATIONS.getStringValue(id);
     }
 
     /**
