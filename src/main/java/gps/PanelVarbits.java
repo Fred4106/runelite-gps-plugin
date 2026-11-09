@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import net.runelite.api.Client;
-import net.runelite.client.RuneLite;
+import net.runelite.api.EnumComposition;
 
 /**
  * The varbits the side panel shows (plan step L25, out of the plugin class), cached on the
@@ -16,12 +16,16 @@ final class PanelVarbits {
     private static final int HOUSE_LOCATION = 2187;
     private static final int HOUSE_LOCATION_ENUM_ID = 252;
     private static final int[] BALLOON_UNLOCKS = {2867, 2868, 2869, 2870, 2871, 2872};
+    private static EnumComposition HOUSE_LOCATION_ENUM;
 
     private volatile int houseLocationId;
     private volatile int[] balloonUnlockVarbits = new int[BALLOON_UNLOCKS.length];
 
     /** Client thread, once per game tick. */
     void onTick(Client client) {
+        if(HOUSE_LOCATION_ENUM == null) {
+            HOUSE_LOCATION_ENUM = client.getEnum(HOUSE_LOCATION_ENUM_ID);
+        }
         houseLocationId = client.getVarbitValue(HOUSE_LOCATION);
         int[] unlocks = new int[BALLOON_UNLOCKS.length];
         for (int i = 0; i < unlocks.length; i++)
@@ -35,11 +39,10 @@ final class PanelVarbits {
     }
 
     static String houseLocationName(int id) {
-            return Optional.ofNullable(RuneLite.getInjector().getInstance(Client.class))
-                .map(c -> c.getEnum(HOUSE_LOCATION_ENUM_ID))
-                .map(ec -> ec.getStringValue(id))
-                .filter(sv -> !sv.equals("nowhere"))
-                .orElse(null);
+        return Optional.ofNullable(HOUSE_LOCATION_ENUM)
+            .map(ec -> ec.getStringValue(id))
+            .filter(sv -> !sv.equals("nowhere"))
+            .orElse(null);
     }
 
     /**
